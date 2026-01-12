@@ -1,0 +1,28 @@
+sequenceDiagram
+    participant browser
+    participant server
+
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/spa
+    activate server
+    server-->>browser: 200 OK / 304 Not Modified (Archivo HTML)
+    deactivate server
+
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
+    activate server
+    server-->>browser: 200 OK / 304 Not Modified (Archivo CSS)
+    deactivate server
+
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/spa.js
+    activate server
+    server-->>browser: 200 OK / 304 Not Modified (Archivo JavaScript)
+    deactivate server
+
+    Note right of browser: El navegador comienza a ejecutar el código JS
+    Note right of browser: El código JS solicita los datos JSON al servidor
+
+    browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
+    activate server
+    server-->>browser: 200 OK (Datos JSON: [{ "content": "...", "date": "..." }, ...])
+    deactivate server
+
+    Note right of browser: El navegador ejecuta la función que procesa los datos <br/> y dibuja las notas en la página (renderizado)

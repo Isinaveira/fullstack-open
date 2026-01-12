@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant browser
+    participant server
+
+    Note right of browser: El usuario hace clic en "Enviar"
+    browser->>server: POST https://api.ejemplo.com/new_note_spa (JSON payload)
+    activate server
+    server-->>browser: 201 Created {content: "Hola", date: "2026-01-12T18:03:19.974Z"}
+    deactivate server
+
+    Note right of browser: El JS añade la nueva nota a la lista existente <br/> sin recargar la página.
