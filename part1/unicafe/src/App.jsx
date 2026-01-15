@@ -6,7 +6,7 @@ const Button = (props) => {
 
 const Header = (props) => <h1>{props.text}</h1>;
 
-const Counter = (props) => (
+const StatisticsLine = (props) => (
   <p>
     {props.text} {props.count}
   </p>
@@ -21,11 +21,11 @@ const Statistics = (props) => {
 
       {total !== 0 ? (
         <>
-          <Counter text="goods" count={props.goodsCount} />
-          <Counter text="neutral" count={props.neutralsCount} />
-          <Counter text="bads" count={props.badsCount} />
-          <Counter text="average" count={props.calculateAvg()} />
-          <Counter
+          <StatisticsLine text="goods" count={props.goodsCount} />
+          <StatisticsLine text="neutral" count={props.neutralsCount} />
+          <StatisticsLine text="bads" count={props.badsCount} />
+          <StatisticsLine text="average" count={props.calculateAvg()} />
+          <StatisticsLine
             text="positive"
             count={props.calculatePositivePercentage()}
           />
