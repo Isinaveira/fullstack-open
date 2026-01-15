@@ -13,14 +13,26 @@ const Counter = (props) => (
 );
 
 const Statistics = (props) => {
+  const total = props.goodsCount + props.neutralsCount + props.badsCount;
+
   return (
     <>
       <Header text="Statistics" />
-      <Counter text="goods" count={props.goodsCount} />
-      <Counter text="neutral" count={props.neutralsCount} />
-      <Counter text="bads" count={props.badsCount} />
-      <Counter text="average" count={props.calculateAvg()} />
-      <Counter text="positive" count={props.calculatePositivePercentage()} />
+
+      {total !== 0 ? (
+        <>
+          <Counter text="goods" count={props.goodsCount} />
+          <Counter text="neutral" count={props.neutralsCount} />
+          <Counter text="bads" count={props.badsCount} />
+          <Counter text="average" count={props.calculateAvg()} />
+          <Counter
+            text="positive"
+            count={props.calculatePositivePercentage()}
+          />
+        </>
+      ) : (
+        <p>No feedback given</p>
+      )}
     </>
   );
 };
@@ -54,12 +66,12 @@ const App = () => {
       <Button text="good" onClick={handleGoodClick}></Button>
       <Button text="neutral" onClick={handleNeutralsClick}></Button>
       <Button text="bad" onClick={handleBadsClick}></Button>
-      <Statistics 
-        goodsCount = {goodsCount}
-        neutralsCount = {neutralsCount}
-        badsCount = {badsCount}
-        calculateAvg = {calculateAvg}
-        calculatePositivePercentage = {calculatePositivePercentage}
+      <Statistics
+        goodsCount={goodsCount}
+        neutralsCount={neutralsCount}
+        badsCount={badsCount}
+        calculateAvg={calculateAvg}
+        calculatePositivePercentage={calculatePositivePercentage}
       />
     </>
   );
