@@ -7,9 +7,10 @@ const Button = (props) => {
 const Header = (props) => <h1>{props.text}</h1>;
 
 const StatisticsLine = (props) => (
-  <p>
-    {props.text} {props.count}
-  </p>
+  <>
+    <td>{props.text}</td>
+    <td>{props.count}</td>
+  </>
 );
 
 const Statistics = (props) => {
@@ -20,16 +21,28 @@ const Statistics = (props) => {
       <Header text="Statistics" />
 
       {total !== 0 ? (
-        <>
-          <StatisticsLine text="goods" count={props.goodsCount} />
-          <StatisticsLine text="neutral" count={props.neutralsCount} />
-          <StatisticsLine text="bads" count={props.badsCount} />
-          <StatisticsLine text="average" count={props.calculateAvg()} />
-          <StatisticsLine
-            text="positive"
-            count={props.calculatePositivePercentage()}
-          />
-        </>
+        <table>
+          <tbody>
+            <tr>
+              <StatisticsLine text="goods" count={props.goodsCount} />
+            </tr>
+            <tr>
+              <StatisticsLine text="neutral" count={props.neutralsCount} />
+            </tr>
+            <tr>
+              <StatisticsLine text="bads" count={props.badsCount} />
+            </tr>
+            <tr>
+              <StatisticsLine text="average" count={props.calculateAvg()} />
+            </tr>
+            <tr>
+              <StatisticsLine
+                text="positive"
+                count={props.calculatePositivePercentage()}
+              />
+            </tr>
+          </tbody>
+        </table>
       ) : (
         <p>No feedback given</p>
       )}
