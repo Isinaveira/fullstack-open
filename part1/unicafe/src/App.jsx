@@ -18,6 +18,20 @@ const App = () => {
   const handleNeutralsClick = () => setNeutralCount(neutralsCount + 1);
   const handleBadsClick = () => setBadsCount(badsCount + 1);
 
+  const calculateAvg = () => {
+    const total = goodsCount + neutralsCount + badsCount;
+    if(total == 0 ) return 0;
+    return (goodsCount - badsCount) / (goodsCount + neutralsCount + badsCount);
+  }
+
+  const calculatePositivePercentage = () => {
+    const total = goodsCount + neutralsCount + badsCount;
+    if(total == 0){
+      return 0 +"%";
+    }
+    return (goodsCount / total) * 100 + "%";
+  }
+
   return (
     <>
       <Header text="Give feedback"/>
@@ -28,8 +42,10 @@ const App = () => {
       <Counter text="goods" count={goodsCount}/>
       <Counter text="neutral" count={neutralsCount}/>
       <Counter text="bads" count={badsCount}/>
+      <Counter text="average" count={calculateAvg()} />
+      <Counter text="positive" count={calculatePositivePercentage()} />
     </>
   )
 }
 
-export default App
+export default App;
