@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from 'axios';
+import phoneBookService from "./services/phoneBookService";
 
 const Filter = (props) => {
   return (
@@ -49,15 +49,14 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [filter, setFilter] = useState("");
-  const dbUrl = "http://localhost:3001/persons"
 
 
   //hook
   useEffect(() => {
-    axios
-      .get(dbUrl)
-      .then(response => {
-        setPersons(response.data)
+    phoneBookService
+      .getAll()
+      .then(persons => {
+        setPersons(persons)
       })
   },[]);
 
