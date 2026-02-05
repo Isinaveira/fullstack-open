@@ -50,16 +50,12 @@ const App = () => {
   const [newPhone, setNewPhone] = useState("");
   const [filter, setFilter] = useState("");
 
-
   //hook
   useEffect(() => {
-    phoneBookService
-      .getAll()
-      .then(persons => {
-        setPersons(persons)
-      })
-  },[]);
-
+    phoneBookService.getAll().then((persons) => {
+      setPersons(persons);
+    });
+  }, []);
 
   //functions & handlers
   const onNewName = (event) => {
@@ -74,14 +70,28 @@ const App = () => {
     setNewPhone(event.target.value);
   };
 
-  const checkNewPerson = () => {
-    return persons.some((p) => p.name.toLowerCase() === newName.toLowerCase());
-  };
   const addPerson = (event) => {
     event.preventDefault();
-    checkNewPerson()
-      ? window.alert(`${newName} is already added to phonebook`)
-      : setPersons([...persons, { name: newName, number: newPhone, id: persons.length + 1 }]);
+
+    const exist = () => {
+      return persons.some(
+        (p) => p.name.toLowerCase() === newName.toLowerCase(),
+      );
+    };
+
+    if (exist()) {
+      window.alert(`${newName} is already added to phonebook`);
+    } else {
+      setPersons([
+        ...persons,
+        { name: newName, number: newPhone, id: (persons.length + 1).toString() },
+      ]);
+      phoneBookService.create({ 
+        name: newName, 
+        number: newPhone, 
+        id: persons.length + 1 
+      });
+    }
     setNewName("");
     setNewPhone("");
   };
