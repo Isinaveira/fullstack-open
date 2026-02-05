@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import phoneBookService from "./services/phoneBookService";
+import './App.css'
 
 const Filter = (props) => {
   return (
@@ -45,20 +46,34 @@ const PersonsList = (props) => {
   );
 };
 
+const Notification = ({ message, type }) => {
+  if (message === null) {
+    return null;
+  }
+
+  // Combina la clase base 'notification' con el tipo ('success' o 'error')
+  return (
+    <div className={`notification ${type}`}>
+      {message}
+    </div>
+  );
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [filter, setFilter] = useState("");
+  // CORRECCIÓN 1: Inicializar en null para que no aparezca al principio
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [notificationType, setNotificationType] = useState('success');
 
-  //hook
   useEffect(() => {
     phoneBookService.getAllNumbers().then((persons) => {
       setPersons(persons);
     });
   }, []);
 
-  //functions & handlers
   const onNewName = (event) => {
     setNewName(event.target.value);
   };
@@ -71,63 +86,74 @@ const App = () => {
     setNewPhone(event.target.value);
   };
 
+  const showNotification = (message, type = 'success') => {
+    setNotificationMessage(message);
+    setNotificationType(type);
+    setTimeout(() => {
+      setNotificationMessage(null);
+    }, 5000);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    // Usamos .find() porque queremos EL objeto, no un array con el objeto
     const existingPerson = persons.find(
       (p) => p.name.toLowerCase() === newName.toLowerCase()
     );
 
     if (existingPerson) {
-      // Si el nombre existe, preguntamos si queremos actualizar el número
-      if (
-        window.confirm(
-          `${existingPerson.name} is already added to phonebook, replace the old number with a new one?`
-        )
-      ) {
+      if (window.confirm(`${existingPerson.name} is already added to phonebook, replace the old number with a new one?`)) {
         const changedPerson = { ...existingPerson, number: newPhone };
 
-        // Asumiendo que tu servicio updateNumber espera (id, objeto_nuevo)
-        // Si tu servicio está hecho distinto, ajusta los argumentos.
         phoneBookService
           .updateNumber(existingPerson.id, changedPerson)
           .then((returnedPerson) => {
-            // Aquí está la clave: Actualizamos el estado recorriendo el array
-            // y reemplazando solo el que coincide con el ID.
-            setPersons(
-              persons.map((p) =>
-                p.id !== existingPerson.id ? p : returnedPerson
-              )
-            );
+            setPersons(persons.map(p => p.id !== existingPerson.id ? p : returnedPerson));
             setNewName("");
             setNewPhone("");
+            // ÉXITO: Mensaje verde
+            showNotification(`Updated ${returnedPerson.name}'s number`, 'success');
           })
-          
+          .catch(error => {
+            // ERROR: Mensaje rojo (aquí es donde manejas el 404)
+            showNotification(
+              `Information of '${existingPerson.name}' has already been removed from server`,
+              'error'
+            );
+            // Sincronizamos el estado local eliminando a la persona fantasma
+            setPersons(persons.filter(p => p.id !== existingPerson.id));
+          });
       }
     } else {
-      // Creación normal
       phoneBookService
-        .createNumber({
-          name: newName,
-          number: newPhone,
-        })
+        .createNumber({ name: newName, number: newPhone })
         .then((returnedPerson) => {
           setPersons(persons.concat(returnedPerson));
           setNewName("");
           setNewPhone("");
+          showNotification(`Added ${returnedPerson.name}`, 'success');
+        })
+        .catch(error => {
+           showNotification(error.response.data.error, 'error');
         });
     }
   };
 
   const deleteNumber = (id) => {
     const person = persons.find(p => p.id === id);
-
     if(window.confirm(`Delete ${person.name}`)){
       phoneBookService
         .deleteNumber(id)
         .then(() => {
           setPersons(persons.filter(p => p.id !== id));
+          showNotification(`Deleted ${person.name}`, 'success');
+        })
+        .catch(error => {
+           showNotification(
+              `Information of '${person.name}' has already been removed from server`,
+              'error'
+            );
+            setPersons(persons.filter(p => p.id !== id));
         });
     }
   }
@@ -139,6 +165,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} type={notificationType} />
       <Filter handleFilterChange={handleFilterChange} filter={filter} />
       <h3>Add a new person</h3>
       <PersonForm
