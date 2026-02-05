@@ -37,6 +37,7 @@ const PersonsList = (props) => {
         return (
           <li key={person.id}>
             {person.name} {person.number}
+            <button onClick={() => props.deleteNumber(person.id)}>delete</button>
           </li>
         );
       })}
@@ -52,7 +53,7 @@ const App = () => {
 
   //hook
   useEffect(() => {
-    phoneBookService.getAll().then((persons) => {
+    phoneBookService.getAllNumbers().then((persons) => {
       setPersons(persons);
     });
   }, []);
@@ -80,21 +81,34 @@ const App = () => {
     };
 
     if (exist()) {
-      window.alert(`${newName} is already added to phonebook`);
+      alert(`${newName} is already added to phonebook`);
+      return;
     } else {
-      setPersons([
-        ...persons,
-        { name: newName, number: newPhone, id: (persons.length + 1).toString() },
-      ]);
-      phoneBookService.create({ 
+      
+      phoneBookService.createNumber({ 
         name: newName, 
-        number: newPhone, 
-        id: persons.length + 1 
-      });
+        number: newPhone 
+      }).then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson));
+        setNewName("");
+        setNewPhone("");
+      })
     }
     setNewName("");
     setNewPhone("");
   };
+
+  const deleteNumber = (id) => {
+    const person = persons.find(p => p.id === id);
+
+    if(window.confirm(`Delete ${person.name}`)){
+      phoneBookService
+        .deleteNumber(id)
+        .then(() => {
+          setPersons(persons.filter(p => p.id !== id));
+        });
+    }
+  }
 
   const peopleToShow = persons.filter((p) =>
     p.name.toLowerCase().includes(filter.toLowerCase()),
@@ -113,7 +127,10 @@ const App = () => {
         onNewPhone={onNewPhone}
       />
       <h3>Numbers</h3>
-      <PersonsList persons={peopleToShow} />
+      <PersonsList 
+        persons={peopleToShow} 
+        deleteNumber={deleteNumber}
+      />
     </div>
   );
 };
