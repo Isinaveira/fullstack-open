@@ -16,7 +16,7 @@ const Filter = (props) => {
 
 const PersonForm = (props) => {
   return (
-    <form onSubmit={props.addPerson}>
+    <form onSubmit={props.handleSubmit}>
       <div>
         name: <input value={props.newName} onChange={props.onNewName} />
       </div>
@@ -71,31 +71,53 @@ const App = () => {
     setNewPhone(event.target.value);
   };
 
-  const addPerson = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
 
-    const exist = () => {
-      return persons.some(
-        (p) => p.name.toLowerCase() === newName.toLowerCase(),
-      );
-    };
+    // Usamos .find() porque queremos EL objeto, no un array con el objeto
+    const existingPerson = persons.find(
+      (p) => p.name.toLowerCase() === newName.toLowerCase()
+    );
 
-    if (exist()) {
-      alert(`${newName} is already added to phonebook`);
-      return;
+    if (existingPerson) {
+      // Si el nombre existe, preguntamos si queremos actualizar el número
+      if (
+        window.confirm(
+          `${existingPerson.name} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const changedPerson = { ...existingPerson, number: newPhone };
+
+        // Asumiendo que tu servicio updateNumber espera (id, objeto_nuevo)
+        // Si tu servicio está hecho distinto, ajusta los argumentos.
+        phoneBookService
+          .updateNumber(existingPerson.id, changedPerson)
+          .then((returnedPerson) => {
+            // Aquí está la clave: Actualizamos el estado recorriendo el array
+            // y reemplazando solo el que coincide con el ID.
+            setPersons(
+              persons.map((p) =>
+                p.id !== existingPerson.id ? p : returnedPerson
+              )
+            );
+            setNewName("");
+            setNewPhone("");
+          })
+          
+      }
     } else {
-      
-      phoneBookService.createNumber({ 
-        name: newName, 
-        number: newPhone 
-      }).then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson));
-        setNewName("");
-        setNewPhone("");
-      })
+      // Creación normal
+      phoneBookService
+        .createNumber({
+          name: newName,
+          number: newPhone,
+        })
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          setNewName("");
+          setNewPhone("");
+        });
     }
-    setNewName("");
-    setNewPhone("");
   };
 
   const deleteNumber = (id) => {
@@ -120,7 +142,7 @@ const App = () => {
       <Filter handleFilterChange={handleFilterChange} filter={filter} />
       <h3>Add a new person</h3>
       <PersonForm
-        addPerson={addPerson}
+        handleSubmit={handleSubmit}
         newName={newName}
         onNewName={onNewName}
         newPhone={newPhone}
