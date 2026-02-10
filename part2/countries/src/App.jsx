@@ -70,7 +70,7 @@ const App = () => {
         searchedCountry={searchedCountry}
         searchCountry={searchCountry}
       />
-      {filteredCountries.length > 1 && filteredCountries.length < 10 && (
+      {filteredCountries.length > 1 && filteredCountries.length <= 10 && (
         <CountriesList countries={filteredCountries} />
       )}
       {filteredCountries.length === 1 && (
