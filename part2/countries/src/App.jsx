@@ -13,7 +13,7 @@ const SearchCountryInput = (props) => {
 
 const CountryInfo = ({ country }) => {
   return (
-    <li key={country.name.common}>
+    <div key={country.name.common}>
       <h1>{country.name.common}</h1>
 
       <p>Capital: {country.capital?.[0] ?? "N/A"}</p>
@@ -30,15 +30,18 @@ const CountryInfo = ({ country }) => {
         <p>No language data</p>
       )}
       <img src={country.flags.png} alt="Country has no flag" />
-    </li>
+    </div>
   );
 };
 
-const CountriesList = ({ countries }) => {
+const CountriesList = ({ countries, showCountry }) => {
   return (
     <>
       {countries.map((country) => (
-        <p>{country.name.common}</p>
+        <>
+          <p>{country.name.common}</p>
+          <button onClick={() => showCountry(country.name.common)}>show</button>
+        </>
       ))}
     </>
   );
@@ -47,8 +50,9 @@ const CountriesList = ({ countries }) => {
 const App = () => {
   const [searchedCountry, setSearchedCountry] = useState("");
   const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
-  const filteredCountries = countries.filter((country) =>
+  let filteredCountries = countries.filter((country) =>
     country.name.common.toLowerCase().includes(searchedCountry.toLowerCase()),
   );
 
@@ -61,17 +65,29 @@ const App = () => {
 
   const searchCountry = (event) => {
     setSearchedCountry(event.target.value);
+    setSelectedCountry(null);
+  };
+
+  const getCountryInfo = (countryName) => {
+    const country = countries.filter(
+      (country) =>
+        country.name.common.toLowerCase() === countryName.toLowerCase()
+    )[0];
+    setSelectedCountry(country);
   };
 
   return (
     <>
-      find countries: 
+      find countries:
       <SearchCountryInput
         searchedCountry={searchedCountry}
         searchCountry={searchCountry}
       />
-      {filteredCountries.length > 1 && filteredCountries.length <= 10 && (
-        <CountriesList countries={filteredCountries} />
+      {filteredCountries.length > 1 && filteredCountries.length <= 10 && ! selectedCountry && (
+        <CountriesList
+          countries={filteredCountries}
+          showCountry={getCountryInfo}
+        />
       )}
       {filteredCountries.length === 1 && (
         <CountryInfo country={filteredCountries[0]} />
@@ -79,6 +95,7 @@ const App = () => {
       {filteredCountries.length > 10 && (
         <p>Too many matches, specify another filter</p>
       )}
+      {selectedCountry && <CountryInfo country={selectedCountry} />}
     </>
   );
 };
