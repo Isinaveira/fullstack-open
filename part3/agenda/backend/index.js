@@ -46,6 +46,14 @@ app.get("/", (request, response) => {
     response.status(200).send("App is running, to see API go to /api");
 });
 
+app.get("/info", (request, response) => {
+    response.send(`
+        <p>Phonebook has info for ${persons.length} people </p>
+        <p>${new Date()}</p>
+    `);
+})
+
+
 app.get("/api", (request, response) => {
     response.status(200).send(endpoints);
 })
