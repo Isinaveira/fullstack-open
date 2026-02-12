@@ -36,6 +36,10 @@ let endpoints = [
   },
 ];
 
+const generateId = () => {
+    return Math.floor(Math.random() * 10000000);
+}
+
 const parseEndpoints = () => {
   endpoints
     .map((e) => `${e.route} -- ${e.description} -- ${baseUrl}${e.route}`)
@@ -75,6 +79,37 @@ app.get("/api/persons/:id", (request, response) => {
 
   response.json(person);
 });
+
+app.post("/api/persons", (request, response) => {
+    const body = request.body;
+
+    if(!body.name || !body.number){
+        return response.status(400).json({
+            error: "name or number missing"
+        });
+    }
+
+    const nameExists = persons.some(person => person.name.toLowerCase() === body.name.toLowerCase());
+
+    if(nameExists){
+        return response.status(400).json({
+            error:"name must be unique, even with lower or upper case"
+        });
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: generateId()
+    };
+
+    persons.push(person);
+    
+    response.status(201).json(person);
+})
+
+
+
 
 app.listen(PORT, () => {
   console.log(`🚀 App ready in http://localhost:${PORT}`);
