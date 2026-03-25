@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 const app = express();
 const cors = require("cors");
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 const baseUrl = `http://localhost:${PORT}/api`;
 const db = require('./db.json');
 
@@ -44,7 +44,7 @@ let endpoints = [
   {
     route: "/api/persons",
     description: "Get all persons in the agenda",
-    url: `${baseUrl}/persons`,
+    url: `/api/persons`,
   },
 ];
 
@@ -64,7 +64,7 @@ app.get("/", (request, response) => {
 
 app.get("/info", (request, response) => {
   response.send(`
-        <p>Phonebook has info for ${persons.length} people </p>
+        <p>Phonebook has info for ${db.persons.length} people </p>
         <p>${new Date()}</p>
     `);
 });
@@ -81,7 +81,7 @@ app.get("/api/persons", (request, response) => {
 app.get("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
 
-  const person = persons.find((person) => person.id === id);
+  const person = db.persons.find((person) => person.id === id);
 
   if (!person) {
     return response.status(404).json({
