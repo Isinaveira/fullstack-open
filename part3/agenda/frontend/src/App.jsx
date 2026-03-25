@@ -69,8 +69,8 @@ const App = () => {
   const [notificationType, setNotificationType] = useState('success');
 
   useEffect(() => {
-    phoneBookService.getAllNumbers().then((data) => {
-      setPersons(data.persons);
+    phoneBookService.getAllNumbers().then((persons) => {
+      setPersons(persons);
     });
   }, []);
 

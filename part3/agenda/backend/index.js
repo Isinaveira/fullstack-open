@@ -4,7 +4,7 @@ const app = express();
 const cors = require("cors");
 const PORT = 3001;
 const baseUrl = `http://localhost:${PORT}/api`;
-const persons = require('./db.json');
+const db = require('./db.json');
 
 app.use(express.json());
 app.use(cors());
@@ -74,7 +74,7 @@ app.get("/api", (request, response) => {
 });
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  response.json(db.persons);
   response.end();
 });
 
@@ -101,7 +101,7 @@ app.post("/api/persons", (request, response) => {
         });
     }
 
-    const nameExists = persons.some(person => person.name.toLowerCase() === body.name.toLowerCase());
+    const nameExists = db.persons.some(person => person.name.toLowerCase() === body.name.toLowerCase());
 
     if(nameExists){
         return response.status(400).json({
@@ -115,7 +115,7 @@ app.post("/api/persons", (request, response) => {
         id: generateId()
     };
 
-    persons.push(person);
+    db.persons.push(person);
     
     response.status(201).json(person);
 })
