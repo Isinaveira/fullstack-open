@@ -1,11 +1,13 @@
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
+const cors = require("cors");
 const PORT = 3001;
 const baseUrl = `http://localhost:${PORT}/api`;
+const persons = require('./db.json');
 
 app.use(express.json());
-
+app.use(cors());
 morgan.token('body', (req, res) => {
   return JSON.stringify(req.body);
 })
@@ -15,7 +17,7 @@ app.use(
   morgan(':method :url :status :res[content-length] - :response-time ms :body')
 );
 
-let persons = [
+/* let persons = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -36,7 +38,7 @@ let persons = [
     name: "Mary Poppendieck",
     number: "39-23-6423122",
   },
-];
+]; */
 
 let endpoints = [
   {
