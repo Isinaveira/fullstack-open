@@ -120,6 +120,18 @@ app.post("/api/persons", (request, response) => {
     response.status(201).json(person);
 })
 
+app.delete("/api/persons/:id", (request, response) => {
+  const id = request.params.id;
+
+  if(!id){
+    return response.status(400).json({
+      error: "id missing"
+    });
+  }
+
+  db.persons = db.persons.filter(p => p.id !== id);
+  response.status(201).json(db.persons);
+})
 
 
 
