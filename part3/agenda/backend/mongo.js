@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
 
+let password = "";
+let name = "";
+let number = "";
+
+console.log(process.argv.length);
+
 if (
   process.argv.length < 3 ||
   process.argv.length === 4 ||
@@ -13,13 +19,15 @@ if (
 }
 
 if (process.argv.length === 3) {
-  const password = process.argv[2];
+  password = process.argv[2];
 }
 
-if (process.argv.length < 5) {
-  const password = process.argv[2];
-  const name = process.argv[3];
-  const number = process.argv[4];
+if (process.argv.length === 5) {
+  console.log("HELLO!!!!!!!!");
+  password = process.argv[2];
+  console.log("Password: ",password);
+  name = process.argv[3];
+  number = process.argv[4];
 }
 
 const url = `mongodb+srv://isinaveira_db:${password}@cluster0.l3ommgk.mongodb.net/phonebook?retryWrites=true&w=majority`;
