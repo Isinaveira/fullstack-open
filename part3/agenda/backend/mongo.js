@@ -4,8 +4,6 @@ let password = "";
 let name = "";
 let number = "";
 
-console.log(process.argv.length);
-
 if (
   process.argv.length < 3 ||
   process.argv.length === 4 ||
@@ -19,13 +17,11 @@ if (
 }
 
 if (process.argv.length === 3) {
-  password = process.argv[2];
+  password = process.argv[2]; 
 }
 
 if (process.argv.length === 5) {
-  console.log("HELLO!!!!!!!!");
   password = process.argv[2];
-  console.log("Password: ",password);
   name = process.argv[3];
   number = process.argv[4];
 }
@@ -44,9 +40,10 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model("Person", personSchema);
 
 if (process.argv.length === 3) {
+  console.log("phonebook:");
   Person.find({}).then((result) => {
     result.forEach((person) => {
-      console.log(person);
+      console.log(`${person.name} ${person.number}`);
     });
     mongoose.connection.close();
   });
