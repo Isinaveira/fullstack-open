@@ -4,7 +4,7 @@ const cors = require("cors");
 const app = express();
 
 const PORT = process.env.PORT || 3001;
-const baseUrl = `http://localhost:${PORT}/api`;
+
 
 const { dbConnection } = require("./mongo");
 const { Person } = require("./models/person");
@@ -15,7 +15,7 @@ app.use(cors());
 app.use(express.static("dist"));
 
 // Configuración de Morgan
-morgan.token("body", (req, res) => JSON.stringify(req.body));
+morgan.token("body", (req) => JSON.stringify(req.body));
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body"),
 );
@@ -73,9 +73,7 @@ app.get("/api/persons/:id", async (request, response, next) => {
 
     response.json(person);
   } catch (error) {
-    console.error("Error al buscar la persona por ID:", error);
-
-    response.status(400).json({ error: "Malformatted id" });
+    next(error)
   }
 });
 
@@ -149,7 +147,7 @@ app.put("/api/persons/:id", async (request, response, next) => {
   }
 });
 
-const unknownEndPoint = (request, response, next) => {
+const unknownEndPoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
 
