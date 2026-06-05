@@ -1,7 +1,14 @@
 const express = require('express');
-const app = express()
+const { dbConnection } = require("./mongo");
+const { Note } = require("./models/note");
+
+const app = express();
 app.use(express.json());
 
+
+dbConnection();
+
+//Mocks
 let notes = [
    {
     id: 1,
@@ -20,18 +27,16 @@ let notes = [
   } 
 ]
 
+
+
 app.get('/', (request, response) => {
     response.send('<h1>Hello world</h1>');
 })
 
 app.get('/api/notes/:id', (request, response) => {
-  const id = Number(request.params.id);
-  const note = notes.find(note => note.id === id)
-  if(note) {
+  const note = Note.findById(request.params.id).then(note => {
     response.json(note);
-  } else {
-    response.status(404).end()
-  }
+  })
 })
 
 app.delete('/api/notes/:id', (request, response) => {
@@ -41,13 +46,6 @@ app.delete('/api/notes/:id', (request, response) => {
   response.status(204).end()
 })
 
-const generateId = () => {
-  const maxId = notes.length > 0
-    ? Math.max(...notes.map(n => n.id))
-    : 0
-  return maxId + 1
-}
-
 app.post('/api/notes', (request, response) => {
   const body = request.body
   if (!body.content) {
@@ -56,20 +54,22 @@ app.post('/api/notes', (request, response) => {
     })
   }
 
-  const note = {
+  const note = new Note ({
     content: body.content,
-    important: Boolean(body.important) || false,
-    id: generateId(),
-  }
+    important: body.important || false,
+  })
   
-  notes.push(note);
+  note.save().then(savedNote => {
+    response.json(savedNote)
+  })
 
-  response.json(note)
 })
 
 
 app.get('/api/notes', (request, response) =>{
-    response.json(notes);
+    Note.find({}).then((notes) => {
+      response.json(notes);
+    })
 })
 
 

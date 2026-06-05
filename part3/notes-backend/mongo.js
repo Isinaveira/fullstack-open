@@ -1,38 +1,32 @@
+// config/database.js
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 
-if (process.env.length < 3) {
-  console.log("give password as argument");
-  process.exit(1);
-}
+// Cargamos las variables de entorno
+dotenv.config();
 
-const password = process.argv[2];
+const dbConnection = async () => {
+  const dbURI = process.env.MONGODB_URI
 
-const url = `mongodb+srv://isinaveira_db:${password}@cluster0.l3ommgk.mongodb.net/noteApp?retryWrites=true&w=majority`;
+  if (!dbURI) {
+    throw new Error(
+      "La variable de entorno MONGODB_URI no está definida.",
+    );
+  }
+
+  await mongoose
+    .connect(dbURI)
+    .then((result) => {
+      console.log("🚀 Conexión exitosa a la base de datos");
+    })
+    .catch((error) => {
+      console.error("❌ Error al conectar a la base de datos:", error.message);
+      process.exit(1);
+    });
+};
 
 mongoose.set("strictQuery", false);
 
-mongoose.connect(url);
-
-const noteSchema = new mongoose.Schema({
-  content: String,
-  important: Boolean,
-});
-
-const Note = mongoose.model("Note", noteSchema);
-
-const note = new Note({
-  content: "HTML is easy",
-  important: true,
-});
-
-note.save().then((result) => {
-  console.log("note saved!");
-  mongoose.connection.close();
-});
-
-Note.find({}).then(result => {
-    result.forEach(note => {
-        console.log(note);
-    })
-    mongoose.connection.close();
-})
+module.exports = {
+  dbConnection
+};
