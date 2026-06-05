@@ -39,7 +39,7 @@ app.get("/api", (request, response) => {
   response.status(200).send(endpoints);
 });
 
-app.get("/info", async (request, response) => {
+app.get("/info", async (request, response, next) => {
   try {
     const count = await Person.countDocuments({});
     response.send(`
@@ -47,26 +47,20 @@ app.get("/info", async (request, response) => {
         <p>${new Date()}</p>
     `);
   } catch (error) {
-    console.error("Error al generar la info: ", error);
-    response
-      .status(500)
-      .send("<p>Error al obtener la información de la base de datos</p>");
+    next(error)
   }
 });
 
-app.get("/api/persons", async (request, response) => {
+app.get("/api/persons", async (request, response, next) => {
   try {
     const persons = await Person.find({});
     response.json(persons);
   } catch (error) {
-    console.error("Error al obtener personas:", error);
-    response
-      .status(500)
-      .json({ error: "Error al obtener los datos de las personas" });
+    next(error)
   }
 });
 
-app.get("/api/persons/:id", async (request, response) => {
+app.get("/api/persons/:id", async (request, response, next) => {
   // CORREGIDO: Añadido async
   try {
     const person = await Person.findById(request.params.id);
@@ -85,7 +79,7 @@ app.get("/api/persons/:id", async (request, response) => {
   }
 });
 
-app.post("/api/persons", async (request, response) => {
+app.post("/api/persons", async (request, response, next) => {
   const body = request.body;
 
   if (!body.name || !body.number) {
@@ -113,24 +107,20 @@ app.post("/api/persons", async (request, response) => {
     const savedPerson = await person.save();
     response.status(201).json(savedPerson);
   } catch (error) {
-    console.error("Error al guardar la persona:", error);
-    response
-      .status(500)
-      .json({ error: "Error al guardar en la base de datos" });
+    next(error)
   }
 });
 
-app.delete("/api/persons/:id", async (request, response) => {
+app.delete("/api/persons/:id", async (request, response, next) => {
   try {
     await Person.findByIdAndDelete(request.params.id);
     response.status(204).end();
   } catch (error) {
-    console.error("Error al eliminar la persona:", error);
-    response.status(400).json({ error: "Malformatted id" });
+    next(error)
   }
 });
 
-app.put("/api/persons/:id", async (request, response) => {
+app.put("/api/persons/:id", async (request, response, next) => {
   const { name, number } = request.body;
 
   // Validación básica de que nos llega el nuevo número
@@ -155,12 +145,11 @@ app.put("/api/persons/:id", async (request, response) => {
 
     response.json(updatedPerson);
   } catch (error) {
-    console.error("Error al actualizar la persona:", error);
-    response.status(400).json({ error: "Malformatted id o error de validación" });
+    next(error);
   }
 });
 
-const unknownEndPoint = (request, response) => {
+const unknownEndPoint = (request, response, next) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
 
@@ -171,6 +160,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({error: error.message});
   }
 
   next(error);
