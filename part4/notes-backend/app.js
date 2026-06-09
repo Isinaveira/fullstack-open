@@ -5,6 +5,8 @@ const cors = require('cors');
 const express = require("express");
 const app = express();
 
+const cors = require('cors');
+
 const { dbConnection } = require("./mongo");
 const notesRouter = require("./controllers/notes");
 
@@ -18,10 +20,8 @@ app.use(middleware.requestLogger);
 
 app.use("/api/notes", notesRouter);
 
-app.use(middleware.unknowEndpoint);
+app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 
 
-module.exports = {
-  app,
-};
+module.exports = app;

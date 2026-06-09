@@ -1,0 +1,12 @@
+GET http://localhost:3001/api/blog
+
+###
+POST http://localhost:3001/api/blog HTTP/1.1
+content-Type: application/json
+
+{
+  "title": "La Pizarrita",
+  "author": "Miguel Quintana",
+  "url": "https://www.marca.com/radio/programas/pizarraquintana.html",
+  "likes": 3000
+}
